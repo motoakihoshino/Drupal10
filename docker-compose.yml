@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+    mysql:
+        platform: linux/x86_64
+        image: mysql:8.0.25
+        environment:
+            - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+            - MYSQL_DATABASE=${DB_DATABASE}
+            - MYSQL_USER=${DB_USERNAME}
+            - MYSQL_PASSWORD=${DB_PASSWORD}
+        ports:
+            - "3306:3306"
+    drupal:
+        build:
+            context: ./
+        volumes:
+            - ./web/themes:/var/www/html/themes
+            - ./web/modules:/var/www/html/modules
+            - ./web/sites:/var/www/html/sites
+            - ./config:/opt/drupal/config
+            - ./composer.json:/opt/drupal/composer.json:rw
+            - ./composer.lock:/opt/drupal/composer.lock:rw
+            - ./php.ini:/usr/local/etc/php/php.ini:rw
+        command: "apache2-foreground"
+        ports:
+            - "80:80"
+        depends_on:
+            - mysql
+volumes:
+    data: {}
